@@ -14,7 +14,6 @@ i_flag=''
 r_flag=''
 a_flag=''
 
-
 while getopts 'ira:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
@@ -30,6 +29,7 @@ if ! [ -z $i_flag ]; then
 elif ! [ -z $r_flag ]; then
     bash ${shautomate_dir}/git_automation.sh
 elif ! [ -z $a_flag ]; then
+    cd ${a_flag}
     bash ${shautomate_dir}/start_git_automation.sh
 else
     print_usage
