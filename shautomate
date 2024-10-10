@@ -17,7 +17,7 @@ initialize() {
         echo '${HOME} not found, is a HOME alias set in your PATH?'
         return [n]
     fi  
-    mkdir p ${shautomate_dir}
+    mkdir ${shautomate_dir}
     DATE=$(date +%Y%m%d%H%M%S)
     echo ${DATE} > "${shautomate_dir}/last_run.txt"
     if test -d "${shautomate_dir}/automation_list.config"; then
