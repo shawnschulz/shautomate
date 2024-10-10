@@ -67,6 +67,8 @@ git_automation() {
 
             CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+            git stash
+
             git switch -c autosave
 
             git switch autosave
@@ -94,6 +96,8 @@ git_automation() {
             git push origin autosave
             
             git switch ${CURRENT_BRANCH}
+            
+            git stash pop
 
         fi
 
