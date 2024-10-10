@@ -101,7 +101,7 @@ git_automation() {
 
     NEW_RUNTIME=$(date +%Y%m%d%H%M%S)
 
-    echo ${NEW_RUNTIME} > "/home/bankerz/bash_scripts/last_run.txt"
+    echo ${NEW_RUNTIME} > "${shautomate_dir}/last_run.txt"
 }
 
 start_automation() {
