@@ -132,7 +132,7 @@ while getopts 'irsa:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
     r) r_flag='true' ;;
-    s) s_flag="${OPTARG}" ;;
+    x) x_flag="${OPTARG}" ;;
     a) a_flag="${OPTARG}" ;;
     *) print_usage
        exit 1 ;;
@@ -146,7 +146,7 @@ elif ! [ -z $r_flag ]; then
 elif ! [ -z $a_flag ]; then
     start_automation "$a_flag"
 elif ! [ -z $s_flag ]; then
-    start_automation "$s_flag"
+    start_automation "$x_flag"
 else
     print_usage
 fi
