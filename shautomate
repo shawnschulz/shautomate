@@ -47,6 +47,7 @@ git_automation() {
     for fp in $(cat ${AUTOMATION_LIST}); do
 
         LAST_MODIFIED=$(date -r $fp +%Y%m%d%H%M%S)
+
         cd $fp
         
         if [ $LAST_RUNTIME -ge $LAST_MODIFIED ]; then
@@ -64,18 +65,20 @@ git_automation() {
 
             FILES=$(find . \( ! -regex '.*/\..*' \) \( -not -name "*temp*" -and -not -path '"*/."' \))
 
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+            git switch -c autosave
+
+            for fp in $FILES;
+            do
+                git checkout ${CURRENT_BRANCH} $(basename ${fp})
+            done
+
             for fp in $FILES;
             do
                 git add ${fp}
             done
 
-            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-            git switch -c autosave
-
-            git switch ${CURRENT_BRANCH}
-
-            git push --force-with-lease origin ${CURRENT_BRANCH}:autosave -m "Autosave at time: ${DATETIME}"
 
         fi
 
