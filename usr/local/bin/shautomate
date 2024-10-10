@@ -17,12 +17,21 @@ initialize() {
         echo '${HOME} not found, is a HOME alias set in your PATH?'
         return [n]
     fi  
+    mkdir p ${shautomate_dir}
     DATE=$(date +%Y%m%d%H%M%S)
     echo ${DATE} > "${shautomate_dir}/last_run.txt"
     if test -d "${shautomate_dir}/automation_list.config"; then
         :
     else
         touch "${shautomate_dir}/automation_list.config"
+    fi
+    crontab -l > "${shautomate_dir}/crontab_copy"
+    if [[ -z $(grep "shautomate -r" "${shautomate_dir}/crontab_copy") ]]; then
+        echo '0,30 * * * * /bin/bash -c "shautomate -r"' >> "${shautomate_dir}/crontab_copy"
+        crontab "${shautomate_dir}/crontab_copy"
+        rm "${shautomate_dir}/crontab_copy"
+    else
+        echo "crontab automation already set up for shautomate"
     fi
 }
 
@@ -64,13 +73,9 @@ git_automation() {
 
             git switch -c autosave
 
-            git switch autosave
+            git switch ${CURRENT_BRANCH}
 
-            git commit -a -m "Autosave at time: ${DATETIME}"
-
-            git push --set-upstream origin autosave
-
-            git checkout ${CURRENT_BRANCH}
+            git push --force-with-lease origin ${CURRENT_BRANCH}:autosave -m "Autosave at time: ${DATETIME}"
 
         fi
 
