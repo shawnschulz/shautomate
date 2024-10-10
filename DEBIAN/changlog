@@ -1,0 +1,6 @@
+shautomate (0.1-3) unstable; urgency=high
+  [ Shawn Schulz ]
+  * Add ability to remove directories from autosaving
+    Fix bugs with adding files tracked in main but not in autosave, now autosave always gets its changes overwritten by the branch your working off of (don't worry though, you can always checkout previous commits).
+    Users should note that this means autosave branch can get quite bloated if you working with a bunch of different branches, would recommend not using shautomate if you have lots of different branches you are working off of that you don't want a superposition of in autosave
+    Add conditional stashing to allow autosaving while untracked changes but also prevent stash pop merge conflicts when git stash doesn't work
