@@ -133,7 +133,7 @@ stop_automation()
 i_flag=''
 r_flag=''
 a_flag=''
-x_flag =''
+x_flag=''
 
 while getopts 'irxa:v' flag; do
   case "${flag}" in
