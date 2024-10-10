@@ -4,7 +4,7 @@ This repository contains a very simple bash command line tool for setting up aut
 
 # Installation
 
-Currently shautomate is only released as a .deb package, meaning it only works on linux distributions and required dpkg to be installed.
+Currently shautomate is only released as a .deb package, meaning it only works on linux distributions and requires dpkg to be installed.
 
 To install, go to releases and download the latest release. Then you can run
 
