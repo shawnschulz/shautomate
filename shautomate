@@ -135,7 +135,7 @@ r_flag=''
 a_flag=''
 x_flag=''
 
-while getopts 'irxa:v' flag; do
+while getopts 'ira:x:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
     r) r_flag='true' ;;
