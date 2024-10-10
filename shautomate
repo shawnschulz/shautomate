@@ -68,7 +68,7 @@ git_automation() {
 
             CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-            git stash
+            git stash "autosave stash"
 
             git switch -c autosave
 
@@ -98,7 +98,9 @@ git_automation() {
             
             git switch ${CURRENT_BRANCH}
             
-            git stash pop
+            if ! [[ -z $(git stash list | grep "autosave stash") ]]; then
+                git stash pop
+            fi
 
         fi
 
