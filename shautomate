@@ -69,6 +69,16 @@ git_automation() {
 
             git switch -c autosave
 
+            git switch autosave
+
+            # Note, this adds EVERYTHING from your current local branch and
+            # pushes it as a new commit, which modifies your files in
+            # autosaves based on this. If you create a new branch that is
+            # missing files, autosaves will start to look like a superposition
+            # of everything you've ever wrote, which is very messy and could cause weird merge conflict-y stuff. I'd
+            # delete the autosave branch if you find yourself doing this and 
+            # stop using shautomate if you find this happening
+            
             for fp in $FILES;
             do
                 git checkout ${CURRENT_BRANCH} $(basename ${fp})
@@ -79,6 +89,9 @@ git_automation() {
                 git add ${fp}
             done
 
+            git commit -a -m "Auto saving at time: ${DATETIME}"
+
+            git push origin autosave
 
         fi
 
@@ -107,15 +120,23 @@ start_automation() {
     fi
 }
 
+stop_automation() 
+{
+    INPUT_DIR=$1
+    AUTOMATION_LIST="${shautomate_dir}/automation_list.config"
+    grep -vwE ${INPUT_DIR} ${AUTOMATION_LIST} > ${AUTOMATION_LIST}
+}
+
 i_flag=''
 r_flag=''
 a_flag=''
 
 
-while getopts 'ira:v' flag; do
+while getopts 'irsa:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
     r) r_flag='true' ;;
+    x) x_flag="${OPTARG}" ;;
     a) a_flag="${OPTARG}" ;;
     *) print_usage
        exit 1 ;;
@@ -128,6 +149,8 @@ elif ! [ -z $r_flag ]; then
     git_automation
 elif ! [ -z $a_flag ]; then
     start_automation "$a_flag"
+elif ! [ -z $s_flag ]; then
+    start_automation "$x_flag"
 else
     print_usage
 fi
