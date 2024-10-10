@@ -11,7 +11,12 @@ print_usage() {
 }
 
 initialize() {
-    mkdir -p ${shautomate_dir}
+    if test -d "${HOME}/.config"; then
+        mkdir ${shautomate_dir}
+    else
+        echo '${HOME} not found, is a HOME alias set in your PATH?'
+        return [n]
+    fi  
     DATE=$(date +%Y%m%d%H%M%S)
     echo ${DATE} > "${shautomate_dir}/last_run.txt"
     if test -d "${shautomate_dir}/automation_list.config"; then
