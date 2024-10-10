@@ -24,14 +24,6 @@ initialize() {
     else
         touch "${shautomate_dir}/automation_list.config"
     fi
-    crontab -l > "${shautomate_dir}/crontab_copy"
-    if [[ -z $(grep "shautomate -r" "${shautomate_dir}/crontab_copy") ]]; then
-        echo '0,30 * * * * /bin/bash -c "shautomate -r"' >> "${shautomate_dir}/crontab_copy"
-        crontab "${shautomate_dir}/crontab_copy"
-        rm "${shautomate_dir}/crontab_copy"
-    else
-        echo "crontab automation already set up for shautomate"
-    fi
 }
 
 git_automation() {

@@ -1,0 +1,9 @@
+Package: shautomate
+Version: 0.1
+Section: base
+Priority: optional
+Maintainer: bankerz <shawnschulz@gmail.com>
+Architecture: all
+Depends: git
+Description: 
+ Simple git and ftp autosaving
