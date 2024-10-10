@@ -89,6 +89,8 @@ git_automation() {
                 git add ${fp}
             done
 
+            git commit -a -m "Auto saving at time: ${DATETIME}"
+
             git push origin autosave
 
         fi
