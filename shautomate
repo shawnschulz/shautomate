@@ -69,6 +69,8 @@ git_automation() {
 
             git switch -c autosave
 
+            git switch autosave
+
             # Note, this adds EVERYTHING from your current local branch and
             # pushes it as a new commit, which modifies your files in
             # autosaves based on this. If you create a new branch that is
