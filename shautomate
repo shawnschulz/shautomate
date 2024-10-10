@@ -1,0 +1,135 @@
+#!/bin/bash
+
+shautomate_dir=${HOME}/.config/shautomation
+
+print_usage() {
+    printf "Usage: shautomate [options]
+            options:
+            -i run default initialization configuration for shautomate
+            -r run quicksave
+            -a add current directory to autosave \n"
+}
+
+initialize() {
+    if test -d "${HOME}/.config"; then
+        mkdir ${shautomate_dir}
+    else
+        echo '${HOME} not found, is a HOME alias set in your PATH?'
+        return [n]
+    fi  
+    DATE=$(date +%Y%m%d%H%M%S)
+    echo ${DATE} > "${shautomate_dir}/last_run.txt"
+    if test -d "${shautomate_dir}/automation_list.config"; then
+        :
+    else
+        touch "${shautomate_dir}/automation_list.config"
+    fi
+    crontab -l > "${shautomate_dir}/crontab_copy"
+    if [[ -z $(grep "shautomate -r" "${shautomate_dir}/crontab_copy") ]]; then
+        echo '0,30 * * * * /bin/bash -c "shautomate -r"' >> "${shautomate_dir}/crontab_copy"
+        crontab "${shautomate_dir}/crontab_copy"
+        rm "${shautomate_dir}/crontab_copy"
+    else
+        echo "crontab automation already set up for shautomate"
+    fi
+}
+
+git_automation() {
+    LAST_RUN="${shautomate_dir}/last_run.txt"
+
+    #by default, will only even try to check the last 100 repositories
+    #added to automation_list
+    AUTOMATION_LIST="${shautomate_dir}/automation_list.config"
+
+    LAST_RUNTIME=$(cat ${LAST_RUN})
+
+    for fp in $(cat ${AUTOMATION_LIST}); do
+
+        LAST_MODIFIED=$(date -r $fp +%Y%m%d%H%M%S)
+        cd $fp
+        
+        if [ $LAST_RUNTIME -ge $LAST_MODIFIED ]; then
+            #Don't bother autosaving if the last runtime was after last
+            #modification time
+            :
+
+        elif  [[ "true" -eq "$(git rev-parse --is-inside-work-tree)" ]] ; then
+
+            cd $fp
+
+            DATETIME=$(date +%Y%m%d%H%M%S)
+
+            echo "git_automation.config found, running git automations"
+
+            FILES=$(find . \( ! -regex '.*/\..*' \) \( -not -name "*temp*" -and -not -path '"*/."' \))
+
+            for fp in $FILES;
+            do
+                git add ${fp}
+            done
+
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+            git switch -c autosave
+
+            git switch autosave
+
+            git merge ${CURRENT_BRANCH}
+
+            git commit -a -m "Autosave at time: ${DATETIME}"
+
+            git push --set-upstream origin autosave
+
+            git checkout ${CURRENT_BRANCH}
+
+        fi
+
+    done
+
+    NEW_RUNTIME=$(date +%Y%m%d%H%M%S)
+
+    echo ${NEW_RUNTIME} > "/home/bankerz/bash_scripts/last_run.txt"
+}
+
+start_automation() {
+    INPUT_DIR=$1
+    AUTOMATION_LIST="${shautomate_dir}/automation_list.config"
+    CHECK_IN_LIST=$(grep ${INPUT_DIR} $AUTOMATION_LIST)
+
+    if ! [[ -z ${CHECK_IN_LIST} ]]; then
+        echo "Directory already in automation list"
+    elif [[ "true" -eq "$(git rev-parse --is-inside-work-tree)" ]]; then
+        touch git_automation.config
+        if [ $(wc -l < ${AUTOMATION_LIST}) -gt 100 ]; then
+            tail -n +2 ${AUTOMATION_LIST} > ${AUTOMATION_LIST}
+        fi
+        echo $(pwd) >> ${AUTOMATION_LIST}
+    else
+        echo "Current dir is not a git repository."
+    fi
+}
+
+i_flag=''
+r_flag=''
+a_flag=''
+
+
+while getopts 'ira:v' flag; do
+  case "${flag}" in
+    i) i_flag='true' ;;
+    r) r_flag='true' ;;
+    a) a_flag="${OPTARG}" ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+if ! [ -z $i_flag ]; then
+    initialize
+elif ! [ -z $r_flag ]; then
+    git_automation
+elif ! [ -z $a_flag ]; then
+    start_automation "$a_flag"
+else
+    print_usage
+fi
