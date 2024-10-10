@@ -7,6 +7,7 @@ print_usage() {
             options:
             -i run default initialization configuration for shautomate
             -r run quicksave
+            -x remove the current directory from being tracked for autosave
             -a add current directory to autosave \n"
 }
 
@@ -47,6 +48,7 @@ git_automation() {
     for fp in $(cat ${AUTOMATION_LIST}); do
 
         LAST_MODIFIED=$(date -r $fp +%Y%m%d%H%M%S)
+
         cd $fp
         
         if [ $LAST_RUNTIME -ge $LAST_MODIFIED ]; then
@@ -64,18 +66,41 @@ git_automation() {
 
             FILES=$(find . \( ! -regex '.*/\..*' \) \( -not -name "*temp*" -and -not -path '"*/."' \))
 
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+            git stash push -m "autosave stash"
+
+            git switch -c autosave
+
+            git switch autosave
+
+            # Note, this adds EVERYTHING from your current local branch and
+            # pushes it as a new commit, which modifies your files in
+            # autosaves based on this. If you create a new branch that is
+            # missing files, autosaves will start to look like a superposition
+            # of everything you've ever wrote, which is very messy and could cause weird merge conflict-y stuff. I'd
+            # delete the autosave branch if you find yourself doing this and 
+            # stop using shautomate if you find this happening
+            
+            for fp in $FILES;
+            do
+                git checkout ${CURRENT_BRANCH} $(basename ${fp})
+            done
+
             for fp in $FILES;
             do
                 git add ${fp}
             done
 
-            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            git commit -a -m "Auto saving at time: ${DATETIME}"
 
-            git switch -c autosave
-
+            git push origin autosave
+            
             git switch ${CURRENT_BRANCH}
-
-            git push --force-with-lease origin ${CURRENT_BRANCH}:autosave -m "Autosave at time: ${DATETIME}"
+            
+            if ! [[ -z $(git stash list | grep "autosave stash") ]]; then
+                git stash pop
+            fi
 
         fi
 
@@ -83,7 +108,7 @@ git_automation() {
 
     NEW_RUNTIME=$(date +%Y%m%d%H%M%S)
 
-    echo ${NEW_RUNTIME} > "/home/bankerz/bash_scripts/last_run.txt"
+    echo ${NEW_RUNTIME} > "${shautomate_dir}/last_run.txt"
 }
 
 start_automation() {
@@ -104,15 +129,25 @@ start_automation() {
     fi
 }
 
+stop_automation() 
+{
+    #This should hopefully be enough to stop automation
+    INPUT_DIR=$1
+    AUTOMATION_LIST="${shautomate_dir}/automation_list.config"
+    # This outputs a warning but works as expected
+    grep -vwE ${INPUT_DIR} ${AUTOMATION_LIST} > ${AUTOMATION_LIST}
+}
+
 i_flag=''
 r_flag=''
 a_flag=''
+x_flag=''
 
-
-while getopts 'ira:v' flag; do
+while getopts 'ira:x:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
     r) r_flag='true' ;;
+    x) x_flag="${OPTARG}" ;;
     a) a_flag="${OPTARG}" ;;
     *) print_usage
        exit 1 ;;
@@ -125,6 +160,8 @@ elif ! [ -z $r_flag ]; then
     git_automation
 elif ! [ -z $a_flag ]; then
     start_automation "$a_flag"
+elif ! [ -z $x_flag ]; then
+    stop_automation "$x_flag"
 else
     print_usage
 fi
