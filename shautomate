@@ -133,7 +133,7 @@ stop_automation()
 i_flag=''
 r_flag=''
 a_flag=''
-
+x_flag =''
 
 while getopts 'irxa:v' flag; do
   case "${flag}" in
@@ -152,7 +152,7 @@ elif ! [ -z $r_flag ]; then
     git_automation
 elif ! [ -z $a_flag ]; then
     start_automation "$a_flag"
-elif ! [ -z $s_flag ]; then
+elif ! [ -z $x_flag ]; then
     start_automation "$x_flag"
 else
     print_usage
