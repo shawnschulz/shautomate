@@ -124,6 +124,7 @@ start_automation() {
 
 stop_automation() 
 {
+    #This should hopefully be enough to stop automation
     INPUT_DIR=$1
     AUTOMATION_LIST="${shautomate_dir}/automation_list.config"
     grep -vwE ${INPUT_DIR} ${AUTOMATION_LIST} > ${AUTOMATION_LIST}
@@ -134,7 +135,7 @@ r_flag=''
 a_flag=''
 
 
-while getopts 'irsa:v' flag; do
+while getopts 'irxa:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
     r) r_flag='true' ;;
