@@ -7,6 +7,7 @@ print_usage() {
             options:
             -i run default initialization configuration for shautomate
             -r run quicksave
+            -x remove the current directory from being tracked for autosave
             -a add current directory to autosave \n"
 }
 
@@ -67,6 +68,8 @@ git_automation() {
 
             CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+            git stash
+
             git switch -c autosave
 
             git switch autosave
@@ -94,6 +97,8 @@ git_automation() {
             git push origin autosave
             
             git switch ${CURRENT_BRANCH}
+            
+            git stash pop
 
         fi
 
