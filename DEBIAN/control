@@ -1,6 +1,9 @@
 Package: shautomate
 Version: 0.1
-Mainter: bankerz shawnschulz@gmail.com
+Section: base
+Priority: optional
+Maintainer: bankerz <shawnschulz@gmail.com>
 Architecture: all
-Depends: git (>= 2.34.1)
-Description: Simple git and ftp autosaving
+Depends: git
+Description: 
+ Simple git and ftp autosaving
