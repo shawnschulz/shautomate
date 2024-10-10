@@ -92,6 +92,8 @@ git_automation() {
             git commit -a -m "Auto saving at time: ${DATETIME}"
 
             git push origin autosave
+            
+            git switch ${CURRENT_BRANCH}
 
         fi
 
