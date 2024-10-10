@@ -30,12 +30,12 @@ This will create a crontab job. If you want to remove the crontab job later for 
 To add a directory to be tracked for autosaving:
 
 ```
-shautomate -a .
+shautomate -a $(pwd)
 ```
 
 To remove a directory and stop tracking it for autosaving:
 ```
-shautomate -x .
+shautomate -x $(pwd)
 ```
 
 And to manually run a quick save, run:
