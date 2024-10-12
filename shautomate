@@ -8,6 +8,7 @@ print_usage() {
             -i run default initialization configuration for shautomate
             -r run quicksave
             -x remove the current directory from being tracked for autosave
+            -p show directories currenlty being autosaved 
             -a add current directory to autosave \n"
 }
 
@@ -135,15 +136,28 @@ stop_automation()
     grep -vwE ${INPUT_DIR} ${AUTOMATION_LIST} > ${AUTOMATION_LIST}
 }
 
+show_paths()
+{
+    AUTOMATION_LIST="${shautomate_dir}/automation_list.config"
+    echo "Path to list of directories being autosaved: " 
+    echo ${AUTOMATION_LIST}
+    echo "Printing list of directories being autosaved: "
+    echo $(cat ${AUTOMATION_LIST})
+    echo "Printing crontab jobs: "
+    crontab -l | grep "shautomate"
+}
+
 i_flag=''
 r_flag=''
 a_flag=''
 x_flag=''
+p_flag=''
 
-while getopts 'ira:x:v' flag; do
+while getopts 'irpa:x:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
     r) r_flag='true' ;;
+    p) p_flag='true' ;;
     x) x_flag="${OPTARG}" ;;
     a) a_flag="${OPTARG}" ;;
     *) print_usage
@@ -155,6 +169,8 @@ if ! [ -z $i_flag ]; then
     initialize
 elif ! [ -z $r_flag ]; then
     git_automation
+elif ! [ -z $p_flag ]; then
+    show_paths
 elif ! [ -z $a_flag ]; then
     start_automation "$a_flag"
 elif ! [ -z $x_flag ]; then
