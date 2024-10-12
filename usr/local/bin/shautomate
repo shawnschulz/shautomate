@@ -8,6 +8,7 @@ print_usage() {
             -i run default initialization configuration for shautomate
             -r run quicksave
             -x remove the current directory from being tracked for autosave
+            -p show directories currenlty being autosaved 
             -a add current directory to autosave \n"
 }
 
@@ -28,7 +29,7 @@ initialize() {
     fi
     crontab -l > "${shautomate_dir}/crontab_copy"
     if [[ -z $(grep "shautomate -r" "${shautomate_dir}/crontab_copy") ]]; then
-        echo '0,30 * * * * /bin/bash -c "shautomate -r"' >> "${shautomate_dir}/crontab_copy"
+        echo '*/5 * * * * /bin/bash -c "shautomate -r"' >> "${shautomate_dir}/crontab_copy"
         crontab "${shautomate_dir}/crontab_copy"
         rm "${shautomate_dir}/crontab_copy"
     else
@@ -61,8 +62,6 @@ git_automation() {
             cd $fp
 
             DATETIME=$(date +%Y%m%d%H%M%S)
-
-            echo "git_automation.config found, running git automations"
 
             FILES=$(find . \( ! -regex '.*/\..*' \) \( -not -name "*temp*" -and -not -path '"*/."' \))
 
@@ -119,7 +118,6 @@ start_automation() {
     if ! [[ -z ${CHECK_IN_LIST} ]]; then
         echo "Directory already in automation list"
     elif [[ "true" -eq "$(git rev-parse --is-inside-work-tree)" ]]; then
-        touch git_automation.config
         if [ $(wc -l < ${AUTOMATION_LIST}) -gt 100 ]; then
             tail -n +2 ${AUTOMATION_LIST} > ${AUTOMATION_LIST}
         fi
@@ -138,15 +136,28 @@ stop_automation()
     grep -vwE ${INPUT_DIR} ${AUTOMATION_LIST} > ${AUTOMATION_LIST}
 }
 
+show_paths()
+{
+    AUTOMATION_LIST="${shautomate_dir}/automation_list.config"
+    echo "Path to list of directories being autosaved: " 
+    echo ${AUTOMATION_LIST}
+    echo "Printing list of directories being autosaved: "
+    echo $(cat ${AUTOMATION_LIST})
+    echo "Printing crontab jobs: "
+    crontab -l | grep "shautomate"
+}
+
 i_flag=''
 r_flag=''
 a_flag=''
 x_flag=''
+p_flag=''
 
-while getopts 'ira:x:v' flag; do
+while getopts 'irpa:x:v' flag; do
   case "${flag}" in
     i) i_flag='true' ;;
     r) r_flag='true' ;;
+    p) p_flag='true' ;;
     x) x_flag="${OPTARG}" ;;
     a) a_flag="${OPTARG}" ;;
     *) print_usage
@@ -158,6 +169,8 @@ if ! [ -z $i_flag ]; then
     initialize
 elif ! [ -z $r_flag ]; then
     git_automation
+elif ! [ -z $p_flag ]; then
+    show_paths
 elif ! [ -z $a_flag ]; then
     start_automation "$a_flag"
 elif ! [ -z $x_flag ]; then
