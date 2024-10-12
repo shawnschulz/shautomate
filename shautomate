@@ -28,7 +28,7 @@ initialize() {
     fi
     crontab -l > "${shautomate_dir}/crontab_copy"
     if [[ -z $(grep "shautomate -r" "${shautomate_dir}/crontab_copy") ]]; then
-        echo '0,30 * * * * /bin/bash -c "shautomate -r"' >> "${shautomate_dir}/crontab_copy"
+        echo '*/5 * * * * /bin/bash -c "shautomate -r"' >> "${shautomate_dir}/crontab_copy"
         crontab "${shautomate_dir}/crontab_copy"
         rm "${shautomate_dir}/crontab_copy"
     else
