@@ -11,7 +11,7 @@ Currently shautomate is only released as a .deb package, meaning it only works o
 To install, go to releases and download the latest release. Then you can run
 
 ```
-sudo dpkg -i shautomate_0.3.deb
+sudo dpkg -i shautomate_0.1-4.deb
 ```
 
 to install shautomate.
