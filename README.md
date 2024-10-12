@@ -44,6 +44,11 @@ And to manually run a quick save, run:
 shautomate -r
 ```
 
+To print what directories are being tracked, the path to the .config containing the directories, and the crontab job:
+```
+shautomate -p
+```
+
 # TODO
 
 1. Add an option to configure shautomate to zip repositories and upload to an ftp server, giving users a simpler non-git option to autosave for any folder.
